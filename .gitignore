@@ -1,0 +1,12 @@
+node_modules
+.env.local
+.env
+dist
+data/raw
+data/classified
+data/briefings
+.next
+out
+.vercel
+.DS_Store
+HANDOVER-daily-automation.md

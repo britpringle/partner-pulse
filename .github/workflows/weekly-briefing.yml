@@ -1,0 +1,38 @@
+name: Weekly Partner Pulse refresh
+
+# Runs the fetch -> classify -> synthesize pipeline for the full core watchlist
+# and writes each briefing to Vercel Blob, which the deployed app reads. This
+# runs on a real runner with genuine internet access, so it is NOT subject to
+# Vercel's serverless function timeout (which a 13-company run would exceed).
+
+on:
+  schedule:
+    # 13:00 UTC every Monday  (~06:00 US Pacific / 09:00 US Eastern).
+    # GitHub cron is UTC-only; adjust the hour if you want a different local time.
+    - cron: "0 13 * * 1"
+  # Lets you trigger a run by hand from the repo's Actions tab ("Run workflow").
+  # This is your private "run it now" button — only people with repo access can
+  # press it, so it never exposes paid API usage to the public site.
+  workflow_dispatch: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate weekly briefings
+        env:
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        run: npm run refresh

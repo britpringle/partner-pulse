@@ -1,0 +1,33 @@
+{
+  "name": "partner-pulse",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "fetch": "tsx src/run-fetch.ts",
+    "classify": "tsx src/run-classify.ts",
+    "synthesize": "tsx src/run-synthesize.ts",
+    "refresh": "tsx src/run-refresh.ts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@vercel/blob": "^2.6.1",
+    "dotenv": "^16.4.5",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}
