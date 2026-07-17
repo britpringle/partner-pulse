@@ -1,22 +1,14 @@
-// Returns the latest pre-generated briefing for a company.
+// Returns the latest pre-generated briefing for one company.
 //
-// Reads only — never calls Tavily/Anthropic at request time, so a public
-// visitor can never trigger paid API usage. The Blob read is wrapped in
-// unstable_cache (revalidated daily) so heavy traffic can't drain the Blob
-// operations quota; briefings change weekly, so daily freshness is plenty.
+// Reads through the shared getAllBriefings cache — same snapshot the overview
+// uses, so the two can never disagree. Reads only; never calls Tavily/Anthropic
+// at request time, so a public visitor can never trigger paid API usage.
 
 import { NextResponse } from "next/server";
-import { unstable_cache } from "next/cache";
 import { slugify } from "../../../../companies";
-import { getLatestBriefing } from "../../../../lib/briefing-store";
+import { getAllBriefings } from "../../../../lib/read-briefings";
 
 export const dynamic = "force-dynamic";
-
-const cachedBriefing = unstable_cache(
-  async (slug: string) => getLatestBriefing(slug),
-  ["briefing-latest"],
-  { revalidate: 86400 }
-);
 
 export async function GET(
   _req: Request,
@@ -25,7 +17,8 @@ export async function GET(
   const company = decodeURIComponent(params.company);
   const slug = slugify(company);
 
-  const briefing = await cachedBriefing(slug);
+  const all = await getAllBriefings();
+  const briefing = all[slug];
 
   if (!briefing) {
     return NextResponse.json(
