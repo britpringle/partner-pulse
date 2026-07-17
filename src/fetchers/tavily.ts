@@ -78,6 +78,21 @@ async function tavilySearch(
  * Each search uses 1-2 Tavily credits. Free tier (1000/mo) handles all
  * 20 companies × 4 queries × ~4 cycles/month easily.
  */
+// Freshness guard: Tavily's news search occasionally returns an old article
+// that resurfaced in the index (e.g. an 8-month-old deal), which would then
+// show up as a current "Action this week." Drop anything clearly older than a
+// couple of weeks before it's ever scored. Undated or unparseable items are
+// kept (rare, and usually still relevant).
+const MAX_SIGNAL_AGE_DAYS = 21;
+
+function isFresh(publishedDate?: string): boolean {
+  if (!publishedDate) return true;
+  const t = new Date(publishedDate).getTime();
+  if (Number.isNaN(t)) return true;
+  const ageDays = (Date.now() - t) / (1000 * 60 * 60 * 24);
+  return ageDays <= MAX_SIGNAL_AGE_DAYS;
+}
+
 export async function fetchSignalsForCompany(
   company: string
 ): Promise<TavilyResult[]> {
@@ -103,7 +118,9 @@ export async function fetchSignalsForCompany(
     }
   }
 
-  const deduped = Array.from(byUrl.values());
+  const deduped = Array.from(byUrl.values()).filter((r) =>
+    isFresh(r.published_date)
+  );
   deduped.sort((a, b) => b.score - a.score);
   return deduped;
 }
