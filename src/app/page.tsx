@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CORE_COMPANIES } from "../companies";
+import { CORE_COMPANIES, TIER_LABELS, tierOf } from "../companies";
 import { CATEGORY_NAMES } from "../categories";
 
 interface CanonicalSignal {
@@ -60,6 +60,15 @@ function domainOf(url: string): string {
 
 function catName(n: number): string {
   return CATEGORY_NAMES[n] || `Category ${n}`;
+}
+
+function TierPill({ company }: { company: string }) {
+  const t = tierOf(company);
+  return (
+    <span className={`tier-pill tier-${t}`} title="Partnership investment tier">
+      Tier {t} · {TIER_LABELS[t]}
+    </span>
+  );
 }
 
 function ActionCard({ item }: { item: BriefingItem }) {
@@ -142,54 +151,72 @@ function Glossary() {
         <dd>
           Every signal gets a composite score of{" "}
           <em>relevance × actionability × source quality</em>. A signal needs a
-          composite of <strong>12</strong> to reach “Action this week”; anything
-          below drops to “Saw &amp; filtered.”
+          composite of <strong>12</strong> to reach the “Action this week” list.
+          Anything below that drops to “Saw &amp; filtered.”
           <ul>
             <li>
-              <strong>Relevance (1–5):</strong> how directly it affects
-              partnership strategy — a named alliance or a Head of Partnerships
+              <strong>Relevance (1 to 5):</strong> how directly it affects
+              partnership strategy. A named alliance or a Head of Partnerships
               hire scores high; general PR scores low.
             </li>
             <li>
-              <strong>Actionability (1–5):</strong> whether a partnerships leader
-              could act on it in the next ~30 days.
+              <strong>Actionability (1 to 5):</strong> whether a partnerships
+              leader could act on it within the next month.
             </li>
             <li>
-              <strong>Source quality (0.5–1.5):</strong> a multiplier for how
-              credible the outlet is — 1.5 for Bloomberg/Reuters/primary filings,
-              1.0 for a company press release, 0.5 for a single low-credibility
-              blog.
+              <strong>Source quality (0.5 to 1.5):</strong> a multiplier for how
+              credible the outlet is. It runs from 1.5 for Bloomberg, Reuters, or
+              primary filings, to 1.0 for a company press release, down to 0.5
+              for a single blog with little credibility.
             </li>
           </ul>
         </dd>
 
         <dt>Urgency</dt>
         <dd>
-          <strong>High</strong> — a natural action window inside ~30 days.{" "}
-          <strong>Medium</strong> — a 30–60 day window.{" "}
-          <strong>Low</strong> — no calendar pressure; a longer-horizon signal.
+          <strong>High</strong> means a natural action window within about a
+          month. <strong>Medium</strong> means a window of one to two months.{" "}
+          <strong>Low</strong> means no calendar pressure and a longer horizon.
         </dd>
 
         <dt>Action</dt>
         <dd>
-          <strong>Reach out</strong> — the signal opens a new door: a person to
-          contact, or a relationship to start or re-engage.{" "}
-          <strong>Reorient</strong> — it shifts portfolio priorities: move
-          accounts up or down, or start/stop a program.{" "}
-          <strong>None</strong> — context only, with no concrete 30–60 day move.
-          (A fourth option, “reposition,” is intentionally left out — that
-          depends on private, in-flight deal context the agent can’t see.)
+          <strong>Reach out</strong> means the signal opens a new door: a person
+          to contact, or a relationship to start or rebuild.{" "}
+          <strong>Reorient</strong> means it may change where this company sits
+          in your portfolio, a reason to reconsider its tier (below), up or
+          down. <strong>None</strong> means context only, with no concrete move
+          in the next month or two. A fourth option, “reposition,” is left out on
+          purpose, because it depends on private deal context the agent cannot
+          see.
+        </dd>
+
+        <dt>Tiers</dt>
+        <dd>
+          Each company carries a tier from the Partnership Prioritization
+          Framework, showing how much investment the relationship currently
+          warrants. <strong>Transactional</strong> is light touch, such as a
+          marketplace listing, reseller terms, or co-marketing.{" "}
+          <strong>Strategic</strong> is a real co-selling motion with named
+          owners and a joint go-to-market plan.{" "}
+          <strong>Transformational</strong> is joint product and roadmap work
+          with executive sponsorship and engineering. These tiers are
+          illustrative, set from the vantage of a partnerships lead at a
+          developer and AI platform using only public signals, to show the
+          method rather than represent any company’s real strategy. The tier is
+          a judgment call, not something the agent decides; the signals here are
+          what tell you when a tier may need to change.
         </dd>
 
         <dt>Sources &amp; how they collapse</dt>
         <dd>
-          When several outlets cover the same event (same category, within ~6
-          days, sharing a meaningful headline keyword), they’re grouped into a
-          single item. The most credible outlet becomes the headline source; the
-          rest appear as “also covered by.” A story confirmed by multiple
+          When several outlets cover the same event (same category, within about
+          six days, sharing a meaningful headline keyword), they’re grouped into
+          a single item. The most credible outlet becomes the headline source,
+          and the rest appear as “also covered by.” A story confirmed by multiple
           credible outlets earns a <em>corroboration boost</em> (×1.15 for two
-          sources, up to ×1.3 for four or more) — because independent
-          confirmation makes it more real. Low-credibility duplicates still show
+          sources, up to ×1.3 for four or more), because independent confirmation
+          makes it more real. Duplicates from low credibility sources still show
           up for transparency but don’t boost the score.
         </dd>
       </dl>
@@ -307,7 +334,10 @@ export default function Home() {
             withActions.map((c) => (
               <div className="company-group" key={c.slug}>
                 <button className="company-head" onClick={() => jumpToCompany(c.company)}>
-                  <span className="company-name">{c.company}</span>
+                  <span className="company-head-left">
+                    <span className="company-name">{c.company}</span>
+                    <TierPill company={c.company} />
+                  </span>
                   <span className="company-count">
                     {c.above.length} action{c.above.length === 1 ? "" : "s"} ↓
                   </span>
@@ -341,6 +371,7 @@ export default function Home() {
             </option>
           ))}
         </select>
+        <TierPill company={company} />
         {data && (
           <span className="meta">
             generated {new Date(data.generated_at).toLocaleString()}

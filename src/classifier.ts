@@ -10,6 +10,7 @@ config({ path: ".env.local" });
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { TavilyResult } from "./fetchers/tavily.js";
+import { tierOf, TIER_LABELS } from "./companies.js";
 
 const CLASSIFIER_MODEL = "claude-haiku-4-5-20251001";
 
@@ -63,6 +64,12 @@ action_mode (one of three — "reposition" is intentionally NOT a valid option b
   none — context only, no concrete action in the next 30-60 days. Should be rare for above-threshold signals — if you can't name a reach_out or reorient action, the signal is probably below threshold.
 
 Important: if a signal would naturally be "reposition" (i.e., it changes the terms of a conversation you're already in) and does NOT also open a new door or shift portfolio priorities, default to "none" — the agent cannot assess reposition signals reliably without private CRM context.
+
+TIER-AWARE REORIENT
+Each target company has a current partnership tier: 1 = Transactional, 2 = Strategic, 3 = Transformational (the highest). The company's current tier is given in the input. When action_mode is "reorient", respect that tier and make the DIRECTION explicit in recommended_action:
+- Tier 3 (Transformational) is the ceiling — it cannot be promoted higher. A reorient here means DEFEND or DEEPEN the existing investment on a positive signal, or flag DOWNGRADE / concentration risk on a negative one. Never imply moving a Tier 3 company "up."
+- Tier 1 or 2: a strong positive signal may justify PROMOTING toward a higher tier (name the target tier); a negative signal may justify a DOWNGRADE. Say which.
+Always name the direction — defend, deepen, promote toward Tier N, or watch for downgrade — in recommended_action.
 
 time_sensitivity:
   high — relevant calendar event within 30 days OR signal has a natural 30-day action window (e.g., new BD hire's first 90 days)
@@ -170,7 +177,10 @@ export async function classifySignal(
   }
 
   const domain = extractDomain(signal.url);
+  const tier = tierOf(company);
+  const tierLabel = TIER_LABELS[tier];
   const userMessage = `COMPANY: ${company}
+CURRENT PARTNERSHIP TIER: ${tier} (${tierLabel}${tier === 3 ? ", the ceiling — cannot be promoted higher" : ""})
 
 SIGNAL:
 Title: ${signal.title}

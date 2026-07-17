@@ -26,8 +26,7 @@ export async function GET(
   if (!briefing) {
     return NextResponse.json(
       {
-        error: `No briefing for "${company}" yet.`,
-        hint: "Briefings refresh every Monday. If this persists, check the latest 'Weekly Partner Pulse refresh' run in the GitHub Actions tab.",
+        error: `No briefing for ${company} yet. Briefings refresh every Monday.`,
       },
       { status: 404 }
     );
