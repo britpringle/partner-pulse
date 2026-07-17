@@ -301,6 +301,10 @@ export default function Home() {
         Public signals across your watchlist, scored the same way a partnership
         opportunity gets scored.
       </div>
+      <p className="note">
+        Tiers are illustrative, assigned from a public-signals view to
+        demonstrate the method rather than represent any real strategy.
+      </p>
 
       <div className="controls">
         <span className="overview-count">
@@ -412,6 +416,18 @@ export default function Home() {
           </details>
         </>
       )}
+
+      <footer className="site-footer">
+        Built by Brit Pringle. Method:{" "}
+        <a
+          href="/Partnership-Prioritization-Framework.pdf"
+          target="_blank"
+          rel="noreferrer"
+        >
+          The Partnership Prioritization Framework
+        </a>
+        .
+      </footer>
     </main>
   );
 }
