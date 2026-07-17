@@ -202,3 +202,136 @@ summary {
 .error {
   color: var(--accent);
 }
+
+/* ---- Top overview (actions across all companies) ---- */
+
+.overview-count {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  font-weight: bold;
+}
+
+.overview {
+  margin-bottom: 20px;
+}
+
+.company-group {
+  margin-bottom: 18px;
+}
+
+.company-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 6px 0;
+  margin-bottom: 6px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.company-head:hover .company-name {
+  color: var(--accent);
+}
+
+.company-name {
+  font-size: 17px;
+  font-weight: bold;
+  color: var(--ink);
+}
+
+.company-count {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.ov-item {
+  padding: 8px 0 8px 12px;
+  border-left: 2px solid var(--rule);
+  margin-bottom: 6px;
+}
+
+.ov-summary {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.ov-facts {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ov-facts a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.quiet {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  color: var(--faint);
+  padding: 10px 0;
+  border-top: 1px dotted var(--rule);
+}
+
+.full-briefing-controls {
+  margin-top: 36px;
+}
+
+/* ---- Glossary ---- */
+
+.glossary {
+  margin: 0 0 24px 0;
+  background: var(--panel);
+  padding: 0 16px;
+}
+
+.glossary > summary {
+  border-top: none;
+  color: var(--ink);
+}
+
+.glossary dl {
+  margin: 4px 0 14px 0;
+}
+
+.glossary dt {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.glossary dd {
+  margin: 4px 0 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13.5px;
+  color: #3a3833;
+  line-height: 1.5;
+}
+
+.glossary ul {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+}
+
+.glossary li {
+  margin-bottom: 4px;
+}
