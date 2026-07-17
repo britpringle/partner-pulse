@@ -26,6 +26,15 @@ function blobPath(slug: string): string {
   return `${BLOB_PREFIX}/${slug}-latest.json`;
 }
 
+// Public base URL of the Blob store, derived from the token
+// (vercel_blob_rw_<storeId>_<secret>). Lets us read a briefing with a single
+// cheap CDN GET instead of a metered list() call.
+function blobBaseUrl(): string | null {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const storeId = token?.split("_")[3];
+  return storeId ? `https://${storeId}.public.blob.vercel-storage.com` : null;
+}
+
 /** Write the "latest" briefing for a company. */
 export async function putLatestBriefing(
   slug: string,
@@ -52,6 +61,20 @@ export async function putLatestBriefing(
 /** Read the "latest" briefing for a company, or null if none exists yet. */
 export async function getLatestBriefing(slug: string): Promise<unknown | null> {
   if (blobEnabled()) {
+    // Fast path: read the public URL directly — a cheap CDN GET, not a metered
+    // list() operation, so heavy traffic won't drain the Blob quota.
+    const base = blobBaseUrl();
+    if (base) {
+      try {
+        const res = await fetch(`${base}/${blobPath(slug)}`, {
+          cache: "no-store",
+        });
+        if (res.ok) return (await res.json()) as unknown;
+      } catch {
+        // fall through to the list()-based lookup below
+      }
+    }
+    // Fallback: discover the URL via list() (e.g. if the base can't be derived).
     const { list } = await import("@vercel/blob");
     const { blobs } = await list({ prefix: blobPath(slug), limit: 1 });
     const match = blobs.find((b) => b.pathname === blobPath(slug)) ?? blobs[0];

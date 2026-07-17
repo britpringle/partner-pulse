@@ -1,5 +1,5 @@
-// The "actions across all companies" overview. Reads through the shared
-// getAllBriefings cache so it is always consistent with the per-company view
+// The "actions across all companies" overview. Reads live through the shared
+// getAllBriefings reader, so it is always consistent with the per-company view
 // and never triggers paid API calls at request time.
 
 import { NextResponse } from "next/server";
